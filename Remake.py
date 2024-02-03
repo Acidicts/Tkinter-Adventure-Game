@@ -1,4 +1,6 @@
 # Imports
+import ast
+import os
 import random
 import tkinter as tk
 from random import randint
@@ -13,6 +15,7 @@ root.resizable(True, True)
 # Variables and Lists
 
 global gold
+global name
 level = 0.1
 maxhp = 0
 hp = 0
@@ -20,11 +23,14 @@ inventory = []
 buttons = []
 labels = []
 images = []
+name = ""
 
 
 def menu():
     makeLabel(root, "Button Game")
     makeButton(root, "Play", start)
+    if os.path.exists("data.txt"):
+        makeButton(root, "Load", load)
     makeButton(root, "Quit", exit)
 
 
@@ -99,6 +105,13 @@ class item:
                 self.manaConsumption = 100
                 self.damage = 10000
 
+    def to_dict(self):
+        return {'name': self.name,
+                'refinement': self.refinement,
+                'type': self.type,
+                'damage': self.damage,
+                'armor': self.armor}
+
 
 class Monster:
     def __init__(self, type, hp, dp):
@@ -129,6 +142,7 @@ def clearScreen():
 
 def home():
     clearScreen()
+    makeLabel(root, "Welcome to the Inn {}".format(name))
     makeButton(root, "Rest", sleep)
     makeButton(root, "Shop", shop)
     makeButton(root, "Hunt", fight)
@@ -338,7 +352,9 @@ def start():
     clearScreen()
 
     def enter():
+        global name
         clearScreen()
+        name = en.get()
         makeLabel(root, ("Hello " + en.get()))
         makeLabel(root, "You have {} Health".format(str(maxhp)))
         makeLabel(root, "You have {} Gold".format(str(gold)))
@@ -370,20 +386,66 @@ def start():
 
     buttons.append(button)
 
+def dict_to_item(item_dict):
+    return item(name=item_dict['name'],
+                damage=item_dict['damage'],
+                type=item_dict['type'],
+                refinement=item_dict['refinement'],
+                armor=item_dict['armor'])
+
+# Save and Load
 def on_closing():
-    with open("data.txt", "w") as f:
-        f.write("Gold: {}\n".format(gold))
-        f.write("Max Health: {}\n".format(maxhp))
-        f.write("Max Mana: {}\n".format(maxMana))
-        f.write("Inventory: {}\n".format(inventory))
-        f.write("Level: {}\n".format(level))
-        f.write("HP: {}\n".format(hp))
-        f.write("Starter: {}\n".format(starter))
+    global name
+    items = [item.to_dict() for item in inventory]
+    try:
+        with open("data.txt", "w") as f:
+            f.write("Gold: {}\n".format(gold))
+            f.write("Max Health: {}\n".format(maxhp))
+            f.write("Max Mana: {}\n".format(maxMana))
+            f.write("Inventory: {}\n".format(items))
+            f.write("Level: {}\n".format(level))
+            f.write("HP: {}\n".format(hp))
+            f.write("Starter: {}\n".format(starter))
+            f.write("Name: {}\n".format(name))
 
-    print("Saving data...")
-    root.destroy()
+        print("Saving data...")
+        root.destroy()
+    except Exception as e:
+        print(e)
+        root.destroy()
 
-root = tk.Tk()
+def load():
+    global gold
+    global maxhp
+    global maxMana
+    global inventory
+    global level
+    global hp
+    global starter
+    global name
+    clearScreen()
+    with open("data.txt", "r") as f:
+        for line in f:
+            if "Gold" in line:
+                gold = int(line[6:])
+            elif "Max Health" in line:
+                maxhp = int(line[12:])
+            elif "Max Mana" in line:
+                maxMana = int(line[10:])
+            elif "Inventory" in line:
+                inventory = [dict_to_item(item) for item in ast.literal_eval(line[11:].strip())]
+            elif "Level" in line:
+                level = float(line[7:])
+            elif "HP" in line:
+                hp = int(line[4:])
+            elif "Starter" in line:
+                starter = bool(line[9:])
+            elif "Name" in line:
+                name = line[6:-1]
+    os.remove("data.txt")
+    home()
+
+
 root.protocol("WM_DELETE_WINDOW", on_closing)
 
 
