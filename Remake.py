@@ -27,13 +27,24 @@ name = ""
 
 
 def menu():
-    makeLabel(root, "Button Game")
-    makeButton(root, "Play", start)
-    if os.path.exists("data.txt"):
-        makeButton(root, "Load", load)
-    makeButton(root, "Quit", exit)
+    make_label(root, "Button Game")
+    make_button(root, "Play", start)
+    if "saves" in os.listdir():
+        make_button(root, "Load", load_menu)
+    else:
+        os.mkdir("saves")
+    make_button(root, "Quit", exit)
 
+def load_menu():
+    clear_screen()
 
+    if os.listdir("saves"):
+        for file in os.listdir("saves"):
+            na = file.split(".")
+
+            make_button(root, na[0], lambda: load("saves/" + na[0] + ".txt"))
+    else:
+        os.mkdir("saves")
 # Classes
 
 class Button(tk.Button):
@@ -121,15 +132,15 @@ class Monster:
 
 
 # Basic Functions
-def makeButton(master, text, command):
+def make_button(master, text, command):
     button = Button(master=master, text=text, command=command)
 
 
-def makeLabel(master, text):
+def make_label(master, text):
     label = Label(master=master, text=text)
 
 
-def clearScreen():
+def clear_screen():
     for i in range(len(buttons)):
         buttons[i].destroy()
     for i in range(len(labels)):
@@ -141,35 +152,34 @@ def clearScreen():
 # Game
 
 def home():
-    clearScreen()
-    makeLabel(root, "Welcome to the Inn {}".format(name))
-    makeButton(root, "Rest", sleep)
-    makeButton(root, "Shop", shop)
-    makeButton(root, "Hunt", fight)
-    makeButton(root, "Stats", stats)
-    makeButton(root, "Spirit Refine", refine)
-    makeButton(root, "Cultivate", manaIncrease)
-    makeButton(root, "Inventory", stuff)
+    clear_screen()
+    make_label(root, "Welcome to the Inn {}".format(name))
+    make_button(root, "Rest", sleep)
+    make_button(root, "Shop", shop)
+    make_button(root, "Hunt", fight)
+    make_button(root, "Stats", stats)
+    make_button(root, "Spirit Refine", refine)
+    make_button(root, "Cultivate", manaIncrease)
+    make_button(root, "Inventory", stuff)
 
 
 def refine():
-    def refine(item, num):
+    def refine_item(item, num):
         global mana
         mana = 0
         wl = randint(0, 1)
         if wl == 1:
             item.refinement += 1
-            makeLabel(root, "{} upgraded to {}".format(inventory[num].name, inventory[num].refinement))
-            pass
+            make_label(root, "{} upgraded to {}".format(item.name, inventory[num].refinement))
         else:
-            makeLabel(root, "{} broke".format(inventory[num].name))
-            del inventory[num]
-        makeButton(root, "Ok", home)
+            make_label(root, "{} broke".format(inventory[num].name))
+            inventory.remove(item)
+        make_button(root, "Ok", home)
 
-    clearScreen()
-    makeLabel(root, "Select an item that will break or upgrade")
+    clear_screen()
+    make_label(root, "Select an item that will break or upgrade")
     for i in range(len(inventory)):
-        makeButton(root, inventory[i].name, lambda: refine(inventory[i], i))
+        make_button(root, inventory[i].name, lambda i=i: refine_item(inventory[i], i))
 
 
 def manaIncrease():
@@ -178,14 +188,14 @@ def manaIncrease():
         global maxMana
         maxMana += random.randint(1, 5) * sword
         del inventory[num]
-        makeLabel(root, "Mana has been cultivated to {}".format(maxMana))
-        makeButton(root, "Ok", home)
+        make_label(root, "Mana has been cultivated to {}".format(maxMana))
+        make_button(root, "Ok", home)
 
-    clearScreen()
-    makeLabel(root, "Sacrifice an item")
+    clear_screen()
+    make_label(root, "Sacrifice an item")
     for i in range(len(inventory)):
-        makeButton(root, inventory[i].name, lambda: sacrifice(inventory[i].refinement, i))
-    makeButton(root, "Back", home)
+        make_button(root, inventory[i].name, lambda: sacrifice(inventory[i].refinement, i))
+    make_button(root, "Back", home)
 
 
 def stats():
@@ -193,15 +203,15 @@ def stats():
     global hp
     global gold
     global level
-    clearScreen()
-    makeLabel(root, "You have {} max health and {} total".format(maxhp, hp))
-    makeLabel(root, "You have {} gold".format(str(gold)))
-    makeLabel(root, "You are level {}".format(str(level)))
-    makeButton(root, "That's Great", home)
+    clear_screen()
+    make_label(root, "You have {} max health and {} total".format(maxhp, hp))
+    make_label(root, "You have {} gold".format(str(gold)))
+    make_label(root, "You are level {}".format(str(level)))
+    make_button(root, "That's Great", home)
 
 def dungeon():
     dungeonFloors = [1,2,3,4,5]
-    clearScreen()
+    clear_screen()
 
 def damage(monster, sword_damage, player_health, armor, use):
     monster.health -= sword_damage
@@ -211,13 +221,16 @@ def damage(monster, sword_damage, player_health, armor, use):
     if use != "Hunt":
         return player_health, monster
     else:
-        makeLabel(root, "The {} did {} reducing the player health to {}".format(monster.mtype, monster.damage, player_health))
+        make_label(root, "The {} did {} reducing the player health to {}".format(monster.mtype, monster.damage, player_health))
         if monster.health <= 0:
-            makeLabel(root, "You vanquished the monster with an attack of {} damage".format(sword_damage))
-            makeButton(root, "Continue", lambda: add(g=random.randint(1,5) * monster.damage/monster.health))
+            global gold
+            make_label(root, "You vanquished the monster with an attack of {} damage".format(sword_damage))
+            monster.damage = max(1, monster.damage)
+            make_button(root, "Continue", lambda: add(g=random.randint(1, 5) * monster.damage))
+            gold = gold//1
         else:
-            makeLabel(root, "You hit the monster down to {} health with and attack of {} damage".format(monster.health, sword_damage))
-            makeButton(root, "Continue", lambda: fight_menu(monster))
+            make_label(root, "You hit the monster down to {} health with and attack of {} damage".format(monster.health, sword_damage))
+            make_button(root, "Continue", lambda: fight_menu(monster))
 
 
 def create_monster():
@@ -233,33 +246,33 @@ def create_monster():
     return Monster(random.choice(monsters), hp, dp)
 
 def sword(armor, mon):
-    clearScreen()
+    clear_screen()
     for i in range(len(inventory)):
         if inventory[i].type == "sword":
-            makeButton(root, inventory[i].name, lambda: damage(mon, inventory[i].damage, hp, armor, "Hunt"))
+            make_button(root, inventory[i].name, lambda: damage(mon, inventory[i].damage, hp, armor, "Hunt"))
             print(inventory[i].damage)
 
 def armor(monster):
-    clearScreen()
+    clear_screen()
     x = 0
     for i in range(len(inventory)):
        if inventory[i].type == "armor":
-            makeButton(root, inventory[i].name, lambda: sword(inventory[i].armor, monster))
+            make_button(root, inventory[i].name, lambda: sword(inventory[i].armor, monster))
             x += 1
     if x == 0:
-        makeButton(root, inventory[i].name, lambda: sword(0, monster))
+        make_button(root, inventory[i].name, lambda: sword(0, monster))
 
 def fight():
      global hp
-     clearScreen()
+     clear_screen()
      mon = create_monster()
-     makeLabel(root, "A {} appeared it has {} health and {} damage".format(mon.mtype, mon.health, mon.damage))
+     make_label(root, "A {} appeared it has {} health and {} damage".format(mon.mtype, mon.health, mon.damage))
      fight_menu(mon)
 
 
 def fight_menu(monster):
-    makeLabel(root, "The {} has {} health and {} attack damage".format(monster.mtype, monster.health, monster.damage))
-    makeButton(root, "Fight", lambda: armor(monster))
+    make_label(root, "The {} has {} health and {} attack damage".format(monster.mtype, monster.health, monster.damage))
+    make_button(root, "Fight", lambda: armor(monster))
 
 def sleep():
     global maxMana
@@ -269,69 +282,70 @@ def sleep():
     mana = maxMana
     bgold = randint(1,5)
     gold += bgold
-    clearScreen()
-    makeLabel(root, ("Your health is {}".format(hp)))
-    makeLabel(root, "You manu has recovered to {}".format(mana))
-    makeLabel(root, "You gained {} gold".format(bgold))
-    makeButton(root, "Return", home)
+    clear_screen()
+    make_label(root, ("Your health is {}".format(hp)))
+    make_label(root, "You manu has recovered to {}".format(mana))
+    make_label(root, "You gained {} gold".format(bgold))
+    make_button(root, "Return", home)
 
 
 def shop():
     global gold
-    clearScreen()
-    makeLabel(root, "You have {} gold".format(gold))
-    makeButton(root, "Sword", lambda: browse("Sword"))
-    makeButton(root, "Armors", lambda: browse("Armor"))
+    clear_screen()
+    make_label(root, "You have {} gold".format(gold))
+    make_button(root, "Sword", lambda: browse("Sword"))
+    make_button(root, "Armors", lambda: browse("Armor"))
 
     def browse(type):
-        clearScreen()
+        clear_screen()
         global starter
         global gold
         print(type)
         if type == "Sword":
-            makeLabel(root, "You have {} gold".format(gold))
+            make_label(root, "You have {} gold".format(gold))
 
-            makeButton(root, "Worn Sword", lambda: buy("Worn Sword", 10, 5, "sword", 0))
-            makeButton(root, "Steel Sword", lambda: buy("Steel Sword", 20, 10, "sword", 0))
-            makeButton(root, "Reinforced Blade", lambda: buy("Reinforced Blade", 30, 20, "sword", 0))
-            makeButton(root, "Battle Struck Blade", lambda: buy("Battle Struck Blade", 40, 25, "sword", 0))
-            makeButton(root, "Fluid like Moving Blade", lambda: buy("Fluid like Moving Blade", 50, 30, "sword", 0))
-            makeButton(root, "The Yellow Katana", lambda: buy("The Yellow Sword", 80, 50, "sword", 0))
+            make_button(root, "Worn Sword", lambda: buy("Worn Sword", 10, 5, "sword", 0))
+            make_button(root, "Steel Sword", lambda: buy("Steel Sword", 20, 10, "sword", 0))
+            make_button(root, "Reinforced Blade", lambda: buy("Reinforced Blade", 30, 20, "sword", 0))
+            make_button(root, "Battle Struck Blade", lambda: buy("Battle Struck Blade", 40, 25, "sword", 0))
+            make_button(root, "Fluid like Moving Blade", lambda: buy("Fluid like Moving Blade", 50, 30, "sword", 0))
+            make_button(root, "The Yellow Katana", lambda: buy("The Yellow Sword", 80, 50, "sword", 0))
         elif type == "Armor":
-            makeLabel(root, "You have {} gold".format(gold))
+            make_label(root, "You have {} gold".format(gold))
 
-            makeButton(root, "Worn Armor", lambda: buy("Worn Armor", 10, 0, "armor", 2))
-            makeButton(root, "Steel Armor", lambda: buy("Steel Armor", 20, 0, "armor", 5))
-            makeButton(root, "Reinforced Armor", lambda: buy("Reinforced Armor", 30, 0, "armor", 8))
-            makeButton(root, "Battle Armor", lambda: buy("Battle Armor", 40, 0, "armor", 10))
-            makeButton(root, "Fluid like Moving Armor", lambda: buy("Fluid like Moving Armor", 50, 0, "armor", 12))
-            makeButton(root, "The Yellow Armor", lambda: buy("The Yellow Armor", 80, 0, "armor", 15))
+            make_button(root, "Worn Armor", lambda: buy("Worn Armor", 10, 0, "armor", 2))
+            make_button(root, "Steel Armor", lambda: buy("Steel Armor", 20, 0, "armor", 5))
+            make_button(root, "Reinforced Armor", lambda: buy("Reinforced Armor", 30, 0, "armor", 8))
+            make_button(root, "Battle Armor", lambda: buy("Battle Armor", 40, 0, "armor", 10))
+            make_button(root, "Fluid like Moving Armor", lambda: buy("Fluid like Moving Armor", 50, 0, "armor", 12))
+            make_button(root, "The Yellow Armor", lambda: buy("The Yellow Armor", 80, 0, "armor", 15))
 
         def buy(sword, price, damage, type, armor):
             global starter
-            clearScreen()
+            clear_screen()
             if type == "sword":
-                makeLabel(root, "{} is {} Gold, with {} damage".format(sword, price, damage))
+                make_label(root, "{} is {} Gold, with {} damage".format(sword, price, damage))
             if type == "armor":
-                makeLabel(root, "{} is {} Gold, with {} protection".format(sword, price, armor))
-            makeButton(root, "Buy", lambda: comfirm(sword, price, damage, type, armor))
-            makeButton(root, "Exit", home)
+                make_label(root, "{} is {} Gold, with {} protection".format(sword, price, armor))
+            make_button(root, "Buy", lambda: comfirm(sword, price, damage, type, armor))
+            make_button(root, "Exit", home)
 
         def comfirm(sword, price, damage, type, armor):
             global gold
-            clearScreen()
+            clear_screen()
             if gold > price or gold == price:
                 gold -= price
-                makeButton(root, "Confirm",
-                           lambda: add(item(name=sword, damage=damage, refinement=1, type=type, armor=armor)))
+                make_button(root, "Confirm",
+                            lambda: add(item(name=sword, damage=damage, refinement=1, type=type, armor=armor)))
             else:
-                makeButton(root, "You can't afford this", home)
+                make_button(root, "You can't afford this", home)
 
 
-def add(item=None,g=0, use="home"):
+def add(item=None, g=0, use="home"):
     global gold
-    clearScreen()
-    gold += g
+    clear_screen()
+    if g > 0:
+        gold += g
     if item != None:
         inventory.append(item)
     if use == "home":
@@ -339,27 +353,27 @@ def add(item=None,g=0, use="home"):
 
 
 def stuff():
-    clearScreen()
+    clear_screen()
     for i in range(len(inventory)):
         if inventory[i].type == "sword":
-            makeLabel(root, (inventory[i].name + " with a damage of {}".format(inventory[i].damage)))
+            make_label(root, (inventory[i].name + " with a damage of {}".format(inventory[i].damage)))
         else:
-            makeLabel(root, inventory[i].name)
-    makeButton(root, "Exit", home)
+            make_label(root, inventory[i].name)
+    make_button(root, "Exit", home)
 
 
 def start():
-    clearScreen()
+    clear_screen()
 
     def enter():
         global name
-        clearScreen()
+        clear_screen()
         name = en.get()
-        makeLabel(root, ("Hello " + en.get()))
-        makeLabel(root, "You have {} Health".format(str(maxhp)))
-        makeLabel(root, "You have {} Gold".format(str(gold)))
-        makeLabel(root, "You have {} Mana".format(maxMana))
-        makeButton(root, "Ok", home)
+        make_label(root, ("Hello " + en.get()))
+        make_label(root, "You have {} Health".format(str(maxhp)))
+        make_label(root, "You have {} Gold".format(str(gold)))
+        make_label(root, "You have {} Mana".format(maxMana))
+        make_button(root, "Ok", home)
         en.destroy()
 
     global maxMana
@@ -398,7 +412,7 @@ def on_closing():
     global name
     items = [item.to_dict() for item in inventory]
     try:
-        with open("data.txt", "w") as f:
+        with open("saves/"+name+".txt", "w") as f:
             f.write("Gold: {}\n".format(gold))
             f.write("Max Health: {}\n".format(maxhp))
             f.write("Max Mana: {}\n".format(maxMana))
@@ -414,7 +428,7 @@ def on_closing():
         print(e)
         root.destroy()
 
-def load():
+def load(n):
     global gold
     global maxhp
     global maxMana
@@ -423,8 +437,8 @@ def load():
     global hp
     global starter
     global name
-    clearScreen()
-    with open("data.txt", "r") as f:
+    clear_screen()
+    with open(n, "r") as f:
         for line in f:
             if "Gold" in line:
                 gold = int(line[6:])
@@ -442,7 +456,6 @@ def load():
                 starter = bool(line[9:])
             elif "Name" in line:
                 name = line[6:-1]
-    os.remove("data.txt")
     home()
 
 
