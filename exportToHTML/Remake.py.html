@@ -1,0 +1,490 @@
+<html>
+<head>
+<title>Remake.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #7a7e85;}
+.s1 { color: #bcbec4;}
+.s2 { color: #cf8e6d;}
+.s3 { color: #bcbec4;}
+.s4 { color: #6aab73;}
+.s5 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Remake.py</font>
+</center></td></tr></table>
+<pre><span class="s0"># Imports</span>
+<span class="s2">import </span><span class="s1">ast</span>
+<span class="s2">import </span><span class="s1">os</span>
+<span class="s2">import </span><span class="s1">random</span>
+<span class="s2">import </span><span class="s1">tkinter </span><span class="s2">as </span><span class="s1">tk</span>
+<span class="s2">from </span><span class="s1">random </span><span class="s2">import </span><span class="s1">randint</span>
+<span class="s2">from </span><span class="s1">sys </span><span class="s2">import </span><span class="s1">exit</span>
+
+<span class="s0"># Startup</span>
+<span class="s1">root </span><span class="s3">= </span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Tk</span><span class="s3">()</span>
+<span class="s1">root</span><span class="s3">.</span><span class="s1">title</span><span class="s3">(</span><span class="s4">&quot;Adventure Game&quot;</span><span class="s3">)</span>
+<span class="s1">root</span><span class="s3">.</span><span class="s1">geometry</span><span class="s3">(</span><span class="s4">'500x300'</span><span class="s3">)</span>
+<span class="s1">root</span><span class="s3">.</span><span class="s1">resizable</span><span class="s3">(</span><span class="s2">True</span><span class="s3">, </span><span class="s2">True</span><span class="s3">)</span>
+
+<span class="s0"># Variables and Lists</span>
+
+<span class="s2">global </span><span class="s1">gold</span>
+<span class="s2">global </span><span class="s1">name</span>
+<span class="s1">level </span><span class="s3">= </span><span class="s5">0.1</span>
+<span class="s1">maxhp </span><span class="s3">= </span><span class="s5">0</span>
+<span class="s1">hp </span><span class="s3">= </span><span class="s5">0</span>
+<span class="s1">inventory </span><span class="s3">= []</span>
+<span class="s1">buttons </span><span class="s3">= []</span>
+<span class="s1">labels </span><span class="s3">= []</span>
+<span class="s1">images </span><span class="s3">= []</span>
+<span class="s1">name </span><span class="s3">= </span><span class="s4">&quot;&quot;</span>
+
+
+<span class="s2">def </span><span class="s1">menu</span><span class="s3">():</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Button Game&quot;</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Play&quot;</span><span class="s3">, </span><span class="s1">start</span><span class="s3">)</span>
+    <span class="s2">if </span><span class="s4">&quot;saves&quot; </span><span class="s2">in </span><span class="s1">os</span><span class="s3">.</span><span class="s1">listdir</span><span class="s3">():</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Load&quot;</span><span class="s3">, </span><span class="s1">load_menu</span><span class="s3">)</span>
+    <span class="s2">else</span><span class="s3">:</span>
+        <span class="s1">os</span><span class="s3">.</span><span class="s1">mkdir</span><span class="s3">(</span><span class="s4">&quot;saves&quot;</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Quit&quot;</span><span class="s3">, </span><span class="s1">exit</span><span class="s3">)</span>
+
+<span class="s2">def </span><span class="s1">load_menu</span><span class="s3">():</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+
+    <span class="s2">if </span><span class="s1">os</span><span class="s3">.</span><span class="s1">listdir</span><span class="s3">(</span><span class="s4">&quot;saves&quot;</span><span class="s3">):</span>
+        <span class="s2">for </span><span class="s1">file </span><span class="s2">in </span><span class="s1">os</span><span class="s3">.</span><span class="s1">listdir</span><span class="s3">(</span><span class="s4">&quot;saves&quot;</span><span class="s3">):</span>
+            <span class="s1">na </span><span class="s3">= </span><span class="s1">file</span><span class="s3">.</span><span class="s1">split</span><span class="s3">(</span><span class="s4">&quot;.&quot;</span><span class="s3">)</span>
+
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">na</span><span class="s3">[</span><span class="s5">0</span><span class="s3">], </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">load</span><span class="s3">(</span><span class="s4">&quot;saves/&quot; </span><span class="s3">+ </span><span class="s1">na</span><span class="s3">[</span><span class="s5">0</span><span class="s3">] + </span><span class="s4">&quot;.txt&quot;</span><span class="s3">))</span>
+    <span class="s2">else</span><span class="s3">:</span>
+        <span class="s1">os</span><span class="s3">.</span><span class="s1">mkdir</span><span class="s3">(</span><span class="s4">&quot;saves&quot;</span><span class="s3">)</span>
+<span class="s0"># Classes</span>
+
+<span class="s2">class </span><span class="s1">Button</span><span class="s3">(</span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Button</span><span class="s3">):</span>
+    <span class="s2">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">master</span><span class="s3">, </span><span class="s1">text</span><span class="s3">, </span><span class="s1">command</span><span class="s3">):</span>
+        <span class="s1">super</span><span class="s3">().</span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">command</span><span class="s3">=</span><span class="s1">command</span><span class="s3">, </span><span class="s1">text</span><span class="s3">=</span><span class="s1">text</span><span class="s3">)</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">text </span><span class="s3">= </span><span class="s1">text</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">command </span><span class="s3">= </span><span class="s1">command</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">root </span><span class="s3">= </span><span class="s1">master</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">button </span><span class="s3">= </span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Button</span><span class="s3">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">root</span><span class="s3">, </span><span class="s1">text</span><span class="s3">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">text</span><span class="s3">, </span><span class="s1">command</span><span class="s3">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">command</span><span class="s3">)</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">make</span><span class="s3">()</span>
+
+    <span class="s2">def </span><span class="s1">make</span><span class="s3">(</span><span class="s1">self</span><span class="s3">):</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">button</span><span class="s3">.</span><span class="s1">pack</span><span class="s3">()</span>
+        <span class="s1">buttons</span><span class="s3">.</span><span class="s1">append</span><span class="s3">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">button</span><span class="s3">)</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">button</span><span class="s3">)</span>
+
+
+<span class="s2">class </span><span class="s1">Canvas</span><span class="s3">(</span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Canvas</span><span class="s3">):</span>
+    <span class="s2">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">master</span><span class="s3">, </span><span class="s1">width</span><span class="s3">, </span><span class="s1">height</span><span class="s3">, </span><span class="s1">bg</span><span class="s3">):</span>
+        <span class="s1">super</span><span class="s3">().</span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">master</span><span class="s3">, </span><span class="s1">bg</span><span class="s3">=</span><span class="s1">bg</span><span class="s3">, </span><span class="s1">height</span><span class="s3">=</span><span class="s1">height</span><span class="s3">, </span><span class="s1">width</span><span class="s3">=</span><span class="s1">width</span><span class="s3">)</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">canvas </span><span class="s3">= </span><span class="s2">None</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">width </span><span class="s3">= </span><span class="s1">width</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">height </span><span class="s3">= </span><span class="s1">height</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">root </span><span class="s3">= </span><span class="s1">master</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">bg </span><span class="s3">= </span><span class="s1">bg</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">display</span><span class="s3">()</span>
+
+    <span class="s2">def </span><span class="s1">display</span><span class="s3">(</span><span class="s1">self</span><span class="s3">):</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">canvas </span><span class="s3">= </span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Canvas</span><span class="s3">(</span><span class="s1">self</span><span class="s3">.</span><span class="s1">root</span><span class="s3">, </span><span class="s1">width</span><span class="s3">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">width</span><span class="s3">, </span><span class="s1">height</span><span class="s3">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">height</span><span class="s3">, </span><span class="s1">bg</span><span class="s3">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">bg</span><span class="s3">)</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">canvas</span><span class="s3">.</span><span class="s1">pack</span><span class="s3">()</span>
+
+
+<span class="s2">class </span><span class="s1">Label</span><span class="s3">(</span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Label</span><span class="s3">):</span>
+    <span class="s2">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">master</span><span class="s3">, </span><span class="s1">text</span><span class="s3">):</span>
+        <span class="s1">super</span><span class="s3">().</span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">text</span><span class="s3">=</span><span class="s1">text</span><span class="s3">)</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">text </span><span class="s3">= </span><span class="s1">text</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">display</span><span class="s3">()</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">root </span><span class="s3">= </span><span class="s1">master</span>
+
+    <span class="s2">def </span><span class="s1">display</span><span class="s3">(</span><span class="s1">self</span><span class="s3">):</span>
+        <span class="s1">label </span><span class="s3">= </span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">text</span><span class="s3">=</span><span class="s1">self</span><span class="s3">.</span><span class="s1">text</span><span class="s3">)</span>
+        <span class="s1">label</span><span class="s3">.</span><span class="s1">pack</span><span class="s3">()</span>
+        <span class="s1">labels</span><span class="s3">.</span><span class="s1">append</span><span class="s3">(</span><span class="s1">label</span><span class="s3">)</span>
+
+
+<span class="s2">class </span><span class="s1">item</span><span class="s3">:</span>
+    <span class="s2">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">name</span><span class="s3">, </span><span class="s1">damage</span><span class="s3">, </span><span class="s1">type</span><span class="s3">, </span><span class="s1">refinement</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">):</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">name </span><span class="s3">= </span><span class="s1">name</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">refinement </span><span class="s3">= </span><span class="s1">refinement</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">damage </span><span class="s3">= </span><span class="s1">damage </span><span class="s3">* </span><span class="s1">self</span><span class="s3">.</span><span class="s1">refinement</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">type </span><span class="s3">= </span><span class="s1">type</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">armor </span><span class="s3">= </span><span class="s1">armor </span><span class="s3">* </span><span class="s1">refinement</span>
+        <span class="s2">if </span><span class="s1">self</span><span class="s3">.</span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;spell&quot;</span><span class="s3">:</span>
+            <span class="s2">if </span><span class="s4">'frost' </span><span class="s2">in </span><span class="s1">name</span><span class="s3">:</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">spell </span><span class="s3">= </span><span class="s4">'frost'</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">manaConsumption </span><span class="s3">= </span><span class="s5">10</span>
+            <span class="s2">if </span><span class="s4">'fire' </span><span class="s2">in </span><span class="s1">name</span><span class="s3">:</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">spell </span><span class="s3">= </span><span class="s4">'fire'</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">manaConsumption </span><span class="s3">= </span><span class="s5">15</span>
+            <span class="s2">if </span><span class="s4">'life' </span><span class="s2">in </span><span class="s1">name</span><span class="s3">:</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">spell </span><span class="s3">= </span><span class="s4">'life'</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">manaConsumption </span><span class="s3">= </span><span class="s5">20</span>
+            <span class="s2">if </span><span class="s4">'death' </span><span class="s2">in </span><span class="s1">name</span><span class="s3">:</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">spell </span><span class="s3">= </span><span class="s4">'death'</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">manaConsumption </span><span class="s3">= </span><span class="s5">50</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">damage </span><span class="s3">= </span><span class="s5">1000</span>
+            <span class="s2">if </span><span class="s4">'disintegration' </span><span class="s2">in </span><span class="s1">name</span><span class="s3">:</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">spell </span><span class="s3">= </span><span class="s4">'death'</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">manaConsumption </span><span class="s3">= </span><span class="s5">100</span>
+                <span class="s1">self</span><span class="s3">.</span><span class="s1">damage </span><span class="s3">= </span><span class="s5">10000</span>
+
+    <span class="s2">def </span><span class="s1">to_dict</span><span class="s3">(</span><span class="s1">self</span><span class="s3">):</span>
+        <span class="s2">return </span><span class="s3">{</span><span class="s4">'name'</span><span class="s3">: </span><span class="s1">self</span><span class="s3">.</span><span class="s1">name</span><span class="s3">,</span>
+                <span class="s4">'refinement'</span><span class="s3">: </span><span class="s1">self</span><span class="s3">.</span><span class="s1">refinement</span><span class="s3">,</span>
+                <span class="s4">'type'</span><span class="s3">: </span><span class="s1">self</span><span class="s3">.</span><span class="s1">type</span><span class="s3">,</span>
+                <span class="s4">'damage'</span><span class="s3">: </span><span class="s1">self</span><span class="s3">.</span><span class="s1">damage</span><span class="s3">,</span>
+                <span class="s4">'armor'</span><span class="s3">: </span><span class="s1">self</span><span class="s3">.</span><span class="s1">armor</span><span class="s3">}</span>
+
+
+<span class="s2">class </span><span class="s1">Monster</span><span class="s3">:</span>
+    <span class="s2">def </span><span class="s1">__init__</span><span class="s3">(</span><span class="s1">self</span><span class="s3">, </span><span class="s1">type</span><span class="s3">, </span><span class="s1">hp</span><span class="s3">, </span><span class="s1">dp</span><span class="s3">):</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">mtype </span><span class="s3">= </span><span class="s1">type</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">health </span><span class="s3">= </span><span class="s1">hp</span>
+        <span class="s1">self</span><span class="s3">.</span><span class="s1">damage </span><span class="s3">= </span><span class="s1">dp</span>
+
+
+<span class="s0"># Basic Functions</span>
+<span class="s2">def </span><span class="s1">make_button</span><span class="s3">(</span><span class="s1">master</span><span class="s3">, </span><span class="s1">text</span><span class="s3">, </span><span class="s1">command</span><span class="s3">):</span>
+    <span class="s1">button </span><span class="s3">= </span><span class="s1">Button</span><span class="s3">(</span><span class="s1">master</span><span class="s3">=</span><span class="s1">master</span><span class="s3">, </span><span class="s1">text</span><span class="s3">=</span><span class="s1">text</span><span class="s3">, </span><span class="s1">command</span><span class="s3">=</span><span class="s1">command</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">make_label</span><span class="s3">(</span><span class="s1">master</span><span class="s3">, </span><span class="s1">text</span><span class="s3">):</span>
+    <span class="s1">label </span><span class="s3">= </span><span class="s1">Label</span><span class="s3">(</span><span class="s1">master</span><span class="s3">=</span><span class="s1">master</span><span class="s3">, </span><span class="s1">text</span><span class="s3">=</span><span class="s1">text</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">clear_screen</span><span class="s3">():</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">buttons</span><span class="s3">)):</span>
+        <span class="s1">buttons</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">destroy</span><span class="s3">()</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">labels</span><span class="s3">)):</span>
+        <span class="s1">labels</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">destroy</span><span class="s3">()</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">images</span><span class="s3">)):</span>
+        <span class="s1">images</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">destroy</span><span class="s3">()</span>
+
+
+<span class="s0"># Game</span>
+
+<span class="s2">def </span><span class="s1">home</span><span class="s3">():</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Welcome to the Inn {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">name</span><span class="s3">))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Rest&quot;</span><span class="s3">, </span><span class="s1">sleep</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Shop&quot;</span><span class="s3">, </span><span class="s1">shop</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Hunt&quot;</span><span class="s3">, </span><span class="s1">fight</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Stats&quot;</span><span class="s3">, </span><span class="s1">stats</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Spirit Refine&quot;</span><span class="s3">, </span><span class="s1">refine</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Cultivate&quot;</span><span class="s3">, </span><span class="s1">manaIncrease</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Inventory&quot;</span><span class="s3">, </span><span class="s1">stuff</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">refine</span><span class="s3">():</span>
+    <span class="s2">def </span><span class="s1">refine_item</span><span class="s3">(</span><span class="s1">item</span><span class="s3">, </span><span class="s1">num</span><span class="s3">):</span>
+        <span class="s2">global </span><span class="s1">mana</span>
+        <span class="s1">mana </span><span class="s3">= </span><span class="s5">0</span>
+        <span class="s1">wl </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">0</span><span class="s3">, </span><span class="s5">1</span><span class="s3">)</span>
+        <span class="s2">if </span><span class="s1">wl </span><span class="s3">== </span><span class="s5">1</span><span class="s3">:</span>
+            <span class="s1">item</span><span class="s3">.</span><span class="s1">refinement </span><span class="s3">+= </span><span class="s5">1</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;{} upgraded to {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">item</span><span class="s3">.</span><span class="s1">name</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">num</span><span class="s3">].</span><span class="s1">refinement</span><span class="s3">))</span>
+        <span class="s2">else</span><span class="s3">:</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;{} broke&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">num</span><span class="s3">].</span><span class="s1">name</span><span class="s3">))</span>
+            <span class="s1">inventory</span><span class="s3">.</span><span class="s1">remove</span><span class="s3">(</span><span class="s1">item</span><span class="s3">)</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Ok&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Select an item that will break or upgrade&quot;</span><span class="s3">)</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">)):</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name</span><span class="s3">, </span><span class="s2">lambda </span><span class="s1">i</span><span class="s3">=</span><span class="s1">i</span><span class="s3">: </span><span class="s1">refine_item</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">], </span><span class="s1">i</span><span class="s3">))</span>
+
+
+<span class="s2">def </span><span class="s1">manaIncrease</span><span class="s3">():</span>
+
+    <span class="s2">def </span><span class="s1">sacrifice</span><span class="s3">(</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">num</span><span class="s3">):</span>
+        <span class="s2">global </span><span class="s1">maxMana</span>
+        <span class="s1">maxMana </span><span class="s3">+= </span><span class="s1">random</span><span class="s3">.</span><span class="s1">randint</span><span class="s3">(</span><span class="s5">1</span><span class="s3">, </span><span class="s5">5</span><span class="s3">) * </span><span class="s1">sword</span>
+        <span class="s2">del </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">num</span><span class="s3">]</span>
+        <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Mana has been cultivated to {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">maxMana</span><span class="s3">))</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Ok&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Sacrifice an item&quot;</span><span class="s3">)</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">)):</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">sacrifice</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">refinement</span><span class="s3">, </span><span class="s1">i</span><span class="s3">))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Back&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">stats</span><span class="s3">():</span>
+    <span class="s2">global </span><span class="s1">maxhp</span>
+    <span class="s2">global </span><span class="s1">hp</span>
+    <span class="s2">global </span><span class="s1">gold</span>
+    <span class="s2">global </span><span class="s1">level</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} max health and {} total&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">maxhp</span><span class="s3">, </span><span class="s1">hp</span><span class="s3">))</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} gold&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">str</span><span class="s3">(</span><span class="s1">gold</span><span class="s3">)))</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You are level {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">str</span><span class="s3">(</span><span class="s1">level</span><span class="s3">)))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;That's Great&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+<span class="s2">def </span><span class="s1">dungeon</span><span class="s3">():</span>
+    <span class="s1">dungeonFloors </span><span class="s3">= [</span><span class="s5">1</span><span class="s3">,</span><span class="s5">2</span><span class="s3">,</span><span class="s5">3</span><span class="s3">,</span><span class="s5">4</span><span class="s3">,</span><span class="s5">5</span><span class="s3">]</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+
+<span class="s2">def </span><span class="s1">damage</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">, </span><span class="s1">sword_damage</span><span class="s3">, </span><span class="s1">player_health</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">, </span><span class="s1">use</span><span class="s3">):</span>
+    <span class="s1">monster</span><span class="s3">.</span><span class="s1">health </span><span class="s3">-= </span><span class="s1">sword_damage</span>
+    <span class="s1">temp </span><span class="s3">= </span><span class="s1">armor</span>
+    <span class="s1">temp </span><span class="s3">-= </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">damage</span>
+    <span class="s1">player_health </span><span class="s3">+= </span><span class="s1">temp</span>
+    <span class="s2">if </span><span class="s1">use </span><span class="s3">!= </span><span class="s4">&quot;Hunt&quot;</span><span class="s3">:</span>
+        <span class="s2">return </span><span class="s1">player_health</span><span class="s3">, </span><span class="s1">monster</span>
+    <span class="s2">else</span><span class="s3">:</span>
+        <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;The {} did {} reducing the player health to {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">.</span><span class="s1">mtype</span><span class="s3">, </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">damage</span><span class="s3">, </span><span class="s1">player_health</span><span class="s3">))</span>
+        <span class="s2">if </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">health </span><span class="s3">&lt;= </span><span class="s5">0</span><span class="s3">:</span>
+            <span class="s2">global </span><span class="s1">gold</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You vanquished the monster with an attack of {} damage&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">sword_damage</span><span class="s3">))</span>
+            <span class="s1">monster</span><span class="s3">.</span><span class="s1">damage </span><span class="s3">= </span><span class="s1">max</span><span class="s3">(</span><span class="s5">1</span><span class="s3">, </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">damage</span><span class="s3">)</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Continue&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">add</span><span class="s3">(</span><span class="s1">g</span><span class="s3">=</span><span class="s1">random</span><span class="s3">.</span><span class="s1">randint</span><span class="s3">(</span><span class="s5">1</span><span class="s3">, </span><span class="s5">5</span><span class="s3">) * </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">damage</span><span class="s3">))</span>
+            <span class="s1">gold </span><span class="s3">= </span><span class="s1">gold</span><span class="s3">//</span><span class="s5">1</span>
+        <span class="s2">else</span><span class="s3">:</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You hit the monster down to {} health with and attack of {} damage&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">.</span><span class="s1">health</span><span class="s3">, </span><span class="s1">sword_damage</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Continue&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">fight_menu</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">))</span>
+
+
+<span class="s2">def </span><span class="s1">create_monster</span><span class="s3">():</span>
+    <span class="s2">global </span><span class="s1">level</span>
+    <span class="s1">monsters </span><span class="s3">= [</span><span class="s4">&quot;Vampire&quot;</span><span class="s3">, </span><span class="s4">&quot;Zombie&quot;</span><span class="s3">, </span><span class="s4">&quot;Golem&quot;</span><span class="s3">, </span><span class="s4">&quot;Ogre&quot;</span><span class="s3">]</span>
+    <span class="s1">hp </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">1</span><span class="s3">,</span><span class="s5">10</span><span class="s3">) * </span><span class="s1">level </span><span class="s3">* </span><span class="s5">5 </span><span class="s3">// </span><span class="s5">1</span>
+    <span class="s2">if </span><span class="s1">level </span><span class="s3">&lt; </span><span class="s5">1</span><span class="s3">:</span>
+        <span class="s1">dp </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">1</span><span class="s3">,</span><span class="s5">5</span><span class="s3">) * </span><span class="s1">level </span><span class="s3">* </span><span class="s5">10 </span><span class="s3">// </span><span class="s5">1</span>
+    <span class="s2">else</span><span class="s3">:</span>
+        <span class="s1">dp </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">1</span><span class="s3">, </span><span class="s5">5</span><span class="s3">) * </span><span class="s1">level </span><span class="s3">// </span><span class="s5">1</span>
+    <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;{} {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">dp</span><span class="s3">, </span><span class="s1">hp</span><span class="s3">))</span>
+
+    <span class="s2">return </span><span class="s1">Monster</span><span class="s3">(</span><span class="s1">random</span><span class="s3">.</span><span class="s1">choice</span><span class="s3">(</span><span class="s1">monsters</span><span class="s3">), </span><span class="s1">hp</span><span class="s3">, </span><span class="s1">dp</span><span class="s3">)</span>
+
+<span class="s2">def </span><span class="s1">sword</span><span class="s3">(</span><span class="s1">armor</span><span class="s3">, </span><span class="s1">mon</span><span class="s3">):</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">)):</span>
+        <span class="s2">if </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;sword&quot;</span><span class="s3">:</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">damage</span><span class="s3">(</span><span class="s1">mon</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">damage</span><span class="s3">, </span><span class="s1">hp</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">, </span><span class="s4">&quot;Hunt&quot;</span><span class="s3">))</span>
+            <span class="s1">print</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">damage</span><span class="s3">)</span>
+
+<span class="s2">def </span><span class="s1">armor</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">):</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">x </span><span class="s3">= </span><span class="s5">0</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">)):</span>
+       <span class="s2">if </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;armor&quot;</span><span class="s3">:</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">sword</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">armor</span><span class="s3">, </span><span class="s1">monster</span><span class="s3">))</span>
+            <span class="s1">x </span><span class="s3">+= </span><span class="s5">1</span>
+    <span class="s2">if </span><span class="s1">x </span><span class="s3">== </span><span class="s5">0</span><span class="s3">:</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">sword</span><span class="s3">(</span><span class="s5">0</span><span class="s3">, </span><span class="s1">monster</span><span class="s3">))</span>
+
+<span class="s2">def </span><span class="s1">fight</span><span class="s3">():</span>
+     <span class="s2">global </span><span class="s1">hp</span>
+     <span class="s1">clear_screen</span><span class="s3">()</span>
+     <span class="s1">mon </span><span class="s3">= </span><span class="s1">create_monster</span><span class="s3">()</span>
+     <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;A {} appeared it has {} health and {} damage&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">mon</span><span class="s3">.</span><span class="s1">mtype</span><span class="s3">, </span><span class="s1">mon</span><span class="s3">.</span><span class="s1">health</span><span class="s3">, </span><span class="s1">mon</span><span class="s3">.</span><span class="s1">damage</span><span class="s3">))</span>
+     <span class="s1">fight_menu</span><span class="s3">(</span><span class="s1">mon</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">fight_menu</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">):</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;The {} has {} health and {} attack damage&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">.</span><span class="s1">mtype</span><span class="s3">, </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">health</span><span class="s3">, </span><span class="s1">monster</span><span class="s3">.</span><span class="s1">damage</span><span class="s3">))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Fight&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">armor</span><span class="s3">(</span><span class="s1">monster</span><span class="s3">))</span>
+
+<span class="s2">def </span><span class="s1">sleep</span><span class="s3">():</span>
+    <span class="s2">global </span><span class="s1">maxMana</span>
+    <span class="s2">global </span><span class="s1">mana</span>
+    <span class="s2">global </span><span class="s1">gold</span>
+    <span class="s1">hp </span><span class="s3">= </span><span class="s1">maxhp</span>
+    <span class="s1">mana </span><span class="s3">= </span><span class="s1">maxMana</span>
+    <span class="s1">bgold </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">1</span><span class="s3">,</span><span class="s5">5</span><span class="s3">)</span>
+    <span class="s1">gold </span><span class="s3">+= </span><span class="s1">bgold</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, (</span><span class="s4">&quot;Your health is {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">hp</span><span class="s3">)))</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You manu has recovered to {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">mana</span><span class="s3">))</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You gained {} gold&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">bgold</span><span class="s3">))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Return&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">shop</span><span class="s3">():</span>
+    <span class="s2">global </span><span class="s1">gold</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} gold&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">gold</span><span class="s3">))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Sword&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">browse</span><span class="s3">(</span><span class="s4">&quot;Sword&quot;</span><span class="s3">))</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Armors&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">browse</span><span class="s3">(</span><span class="s4">&quot;Armor&quot;</span><span class="s3">))</span>
+
+    <span class="s2">def </span><span class="s1">browse</span><span class="s3">(</span><span class="s1">type</span><span class="s3">):</span>
+        <span class="s1">clear_screen</span><span class="s3">()</span>
+        <span class="s2">global </span><span class="s1">starter</span>
+        <span class="s2">global </span><span class="s1">gold</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s1">type</span><span class="s3">)</span>
+        <span class="s2">if </span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;Sword&quot;</span><span class="s3">:</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} gold&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">gold</span><span class="s3">))</span>
+
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Worn Sword&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Worn Sword&quot;</span><span class="s3">, </span><span class="s5">10</span><span class="s3">, </span><span class="s5">5</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Steel Sword&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Steel Sword&quot;</span><span class="s3">, </span><span class="s5">20</span><span class="s3">, </span><span class="s5">10</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Reinforced Blade&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Reinforced Blade&quot;</span><span class="s3">, </span><span class="s5">30</span><span class="s3">, </span><span class="s5">20</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Battle Struck Blade&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Battle Struck Blade&quot;</span><span class="s3">, </span><span class="s5">40</span><span class="s3">, </span><span class="s5">25</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Fluid like Moving Blade&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Fluid like Moving Blade&quot;</span><span class="s3">, </span><span class="s5">50</span><span class="s3">, </span><span class="s5">30</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;The Yellow Katana&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;The Yellow Sword&quot;</span><span class="s3">, </span><span class="s5">80</span><span class="s3">, </span><span class="s5">50</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">))</span>
+        <span class="s2">elif </span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;Armor&quot;</span><span class="s3">:</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} gold&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">gold</span><span class="s3">))</span>
+
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Worn Armor&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Worn Armor&quot;</span><span class="s3">, </span><span class="s5">10</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">2</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Steel Armor&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Steel Armor&quot;</span><span class="s3">, </span><span class="s5">20</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">5</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Reinforced Armor&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Reinforced Armor&quot;</span><span class="s3">, </span><span class="s5">30</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">8</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Battle Armor&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Battle Armor&quot;</span><span class="s3">, </span><span class="s5">40</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">10</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Fluid like Moving Armor&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;Fluid like Moving Armor&quot;</span><span class="s3">, </span><span class="s5">50</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">12</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;The Yellow Armor&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">buy</span><span class="s3">(</span><span class="s4">&quot;The Yellow Armor&quot;</span><span class="s3">, </span><span class="s5">80</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">15</span><span class="s3">))</span>
+
+        <span class="s2">def </span><span class="s1">buy</span><span class="s3">(</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">price</span><span class="s3">, </span><span class="s1">damage</span><span class="s3">, </span><span class="s1">type</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">):</span>
+            <span class="s2">global </span><span class="s1">starter</span>
+            <span class="s1">clear_screen</span><span class="s3">()</span>
+            <span class="s2">if </span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;sword&quot;</span><span class="s3">:</span>
+                <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;{} is {} Gold, with {} damage&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">price</span><span class="s3">, </span><span class="s1">damage</span><span class="s3">))</span>
+            <span class="s2">if </span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;armor&quot;</span><span class="s3">:</span>
+                <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;{} is {} Gold, with {} protection&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">price</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Buy&quot;</span><span class="s3">, </span><span class="s2">lambda</span><span class="s3">: </span><span class="s1">comfirm</span><span class="s3">(</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">price</span><span class="s3">, </span><span class="s1">damage</span><span class="s3">, </span><span class="s1">type</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">))</span>
+            <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Exit&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+        <span class="s2">def </span><span class="s1">comfirm</span><span class="s3">(</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">price</span><span class="s3">, </span><span class="s1">damage</span><span class="s3">, </span><span class="s1">type</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">):</span>
+            <span class="s2">global </span><span class="s1">gold</span>
+            <span class="s1">clear_screen</span><span class="s3">()</span>
+            <span class="s2">if </span><span class="s1">gold </span><span class="s3">&gt; </span><span class="s1">price </span><span class="s2">or </span><span class="s1">gold </span><span class="s3">== </span><span class="s1">price</span><span class="s3">:</span>
+                <span class="s1">gold </span><span class="s3">-= </span><span class="s1">price</span>
+                <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Confirm&quot;</span><span class="s3">,</span>
+                            <span class="s2">lambda</span><span class="s3">: </span><span class="s1">add</span><span class="s3">(</span><span class="s1">item</span><span class="s3">(</span><span class="s1">name</span><span class="s3">=</span><span class="s1">sword</span><span class="s3">, </span><span class="s1">damage</span><span class="s3">=</span><span class="s1">damage</span><span class="s3">, </span><span class="s1">refinement</span><span class="s3">=</span><span class="s5">1</span><span class="s3">, </span><span class="s1">type</span><span class="s3">=</span><span class="s1">type</span><span class="s3">, </span><span class="s1">armor</span><span class="s3">=</span><span class="s1">armor</span><span class="s3">)))</span>
+            <span class="s2">else</span><span class="s3">:</span>
+                <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You can't afford this&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">add</span><span class="s3">(</span><span class="s1">item</span><span class="s3">=</span><span class="s2">None</span><span class="s3">, </span><span class="s1">g</span><span class="s3">=</span><span class="s5">0</span><span class="s3">, </span><span class="s1">use</span><span class="s3">=</span><span class="s4">&quot;home&quot;</span><span class="s3">):</span>
+    <span class="s2">global </span><span class="s1">gold</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s2">if </span><span class="s1">g </span><span class="s3">&gt; </span><span class="s5">0</span><span class="s3">:</span>
+        <span class="s1">gold </span><span class="s3">+= </span><span class="s1">g</span>
+    <span class="s2">if </span><span class="s1">item </span><span class="s3">!= </span><span class="s2">None</span><span class="s3">:</span>
+        <span class="s1">inventory</span><span class="s3">.</span><span class="s1">append</span><span class="s3">(</span><span class="s1">item</span><span class="s3">)</span>
+    <span class="s2">if </span><span class="s1">use </span><span class="s3">== </span><span class="s4">&quot;home&quot;</span><span class="s3">:</span>
+        <span class="s1">home</span><span class="s3">()</span>
+
+
+<span class="s2">def </span><span class="s1">stuff</span><span class="s3">():</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s2">for </span><span class="s1">i </span><span class="s2">in </span><span class="s1">range</span><span class="s3">(</span><span class="s1">len</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">)):</span>
+        <span class="s2">if </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">type </span><span class="s3">== </span><span class="s4">&quot;sword&quot;</span><span class="s3">:</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, (</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name </span><span class="s3">+ </span><span class="s4">&quot; with a damage of {}&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">damage</span><span class="s3">)))</span>
+        <span class="s2">else</span><span class="s3">:</span>
+            <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">inventory</span><span class="s3">[</span><span class="s1">i</span><span class="s3">].</span><span class="s1">name</span><span class="s3">)</span>
+    <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Exit&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+
+
+<span class="s2">def </span><span class="s1">start</span><span class="s3">():</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+
+    <span class="s2">def </span><span class="s1">enter</span><span class="s3">():</span>
+        <span class="s2">global </span><span class="s1">name</span>
+        <span class="s1">clear_screen</span><span class="s3">()</span>
+        <span class="s1">name </span><span class="s3">= </span><span class="s1">en</span><span class="s3">.</span><span class="s1">get</span><span class="s3">()</span>
+        <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, (</span><span class="s4">&quot;Hello &quot; </span><span class="s3">+ </span><span class="s1">en</span><span class="s3">.</span><span class="s1">get</span><span class="s3">()))</span>
+        <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} Health&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">str</span><span class="s3">(</span><span class="s1">maxhp</span><span class="s3">)))</span>
+        <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} Gold&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">str</span><span class="s3">(</span><span class="s1">gold</span><span class="s3">)))</span>
+        <span class="s1">make_label</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;You have {} Mana&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">maxMana</span><span class="s3">))</span>
+        <span class="s1">make_button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s4">&quot;Ok&quot;</span><span class="s3">, </span><span class="s1">home</span><span class="s3">)</span>
+        <span class="s1">en</span><span class="s3">.</span><span class="s1">destroy</span><span class="s3">()</span>
+
+    <span class="s2">global </span><span class="s1">maxMana</span>
+    <span class="s2">global </span><span class="s1">mana</span>
+    <span class="s2">global </span><span class="s1">gold</span>
+    <span class="s2">global </span><span class="s1">hp</span>
+    <span class="s2">global </span><span class="s1">maxhp</span>
+    <span class="s2">global </span><span class="s1">starter</span>
+    <span class="s1">starter </span><span class="s3">= </span><span class="s2">True</span>
+    <span class="s1">maxhp </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">20</span><span class="s3">, </span><span class="s5">40</span><span class="s3">)</span>
+    <span class="s1">maxMana </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(-</span><span class="s5">5</span><span class="s3">, </span><span class="s5">10</span><span class="s3">)</span>
+    <span class="s1">mana </span><span class="s3">= </span><span class="s1">maxMana</span>
+    <span class="s1">hp </span><span class="s3">= </span><span class="s1">maxhp</span>
+    <span class="s1">gold </span><span class="s3">= </span><span class="s1">randint</span><span class="s3">(</span><span class="s5">35</span><span class="s3">, </span><span class="s5">60</span><span class="s3">)</span>
+
+    <span class="s1">en </span><span class="s3">= </span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Entry</span><span class="s3">(</span><span class="s1">root</span><span class="s3">)</span>
+    <span class="s1">en</span><span class="s3">.</span><span class="s1">pack</span><span class="s3">()</span>
+
+    <span class="s1">button </span><span class="s3">= </span><span class="s1">tk</span><span class="s3">.</span><span class="s1">Button</span><span class="s3">(</span><span class="s1">root</span><span class="s3">, </span><span class="s1">text</span><span class="s3">=</span><span class="s4">&quot;Enter&quot;</span><span class="s3">, </span><span class="s1">command</span><span class="s3">=</span><span class="s1">enter</span><span class="s3">)</span>
+    <span class="s1">button</span><span class="s3">.</span><span class="s1">pack</span><span class="s3">()</span>
+
+    <span class="s1">add</span><span class="s3">(</span><span class="s1">item</span><span class="s3">(</span><span class="s4">&quot;Starter Sword&quot;</span><span class="s3">, </span><span class="s5">1</span><span class="s3">, </span><span class="s4">&quot;sword&quot;</span><span class="s3">, </span><span class="s5">1</span><span class="s3">, </span><span class="s5">0</span><span class="s3">),</span><span class="s5">0</span><span class="s3">,</span><span class="s4">&quot;_&quot;</span><span class="s3">)</span>
+    <span class="s1">add</span><span class="s3">(</span><span class="s1">item</span><span class="s3">(</span><span class="s4">&quot;Starter Armor&quot;</span><span class="s3">, </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;armor&quot;</span><span class="s3">, </span><span class="s5">1</span><span class="s3">, </span><span class="s5">1</span><span class="s3">), </span><span class="s5">0</span><span class="s3">, </span><span class="s4">&quot;_&quot;</span><span class="s3">)</span>
+
+    <span class="s1">buttons</span><span class="s3">.</span><span class="s1">append</span><span class="s3">(</span><span class="s1">button</span><span class="s3">)</span>
+
+<span class="s2">def </span><span class="s1">dict_to_item</span><span class="s3">(</span><span class="s1">item_dict</span><span class="s3">):</span>
+    <span class="s2">return </span><span class="s1">item</span><span class="s3">(</span><span class="s1">name</span><span class="s3">=</span><span class="s1">item_dict</span><span class="s3">[</span><span class="s4">'name'</span><span class="s3">],</span>
+                <span class="s1">damage</span><span class="s3">=</span><span class="s1">item_dict</span><span class="s3">[</span><span class="s4">'damage'</span><span class="s3">],</span>
+                <span class="s1">type</span><span class="s3">=</span><span class="s1">item_dict</span><span class="s3">[</span><span class="s4">'type'</span><span class="s3">],</span>
+                <span class="s1">refinement</span><span class="s3">=</span><span class="s1">item_dict</span><span class="s3">[</span><span class="s4">'refinement'</span><span class="s3">],</span>
+                <span class="s1">armor</span><span class="s3">=</span><span class="s1">item_dict</span><span class="s3">[</span><span class="s4">'armor'</span><span class="s3">])</span>
+
+<span class="s0"># Save and Load</span>
+<span class="s2">def </span><span class="s1">on_closing</span><span class="s3">():</span>
+    <span class="s2">global </span><span class="s1">name</span>
+    <span class="s1">items </span><span class="s3">= [</span><span class="s1">item</span><span class="s3">.</span><span class="s1">to_dict</span><span class="s3">() </span><span class="s2">for </span><span class="s1">item </span><span class="s2">in </span><span class="s1">inventory</span><span class="s3">]</span>
+    <span class="s2">try</span><span class="s3">:</span>
+        <span class="s2">with </span><span class="s1">open</span><span class="s3">(</span><span class="s4">&quot;saves/&quot;</span><span class="s3">+</span><span class="s1">name</span><span class="s3">+</span><span class="s4">&quot;.txt&quot;</span><span class="s3">, </span><span class="s4">&quot;w&quot;</span><span class="s3">) </span><span class="s2">as </span><span class="s1">f</span><span class="s3">:</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Gold: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">gold</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Max Health: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">maxhp</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Max Mana: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">maxMana</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Inventory: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">items</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Level: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">level</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;HP: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">hp</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Starter: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">starter</span><span class="s3">))</span>
+            <span class="s1">f</span><span class="s3">.</span><span class="s1">write</span><span class="s3">(</span><span class="s4">&quot;Name: {}</span><span class="s2">\n</span><span class="s4">&quot;</span><span class="s3">.</span><span class="s1">format</span><span class="s3">(</span><span class="s1">name</span><span class="s3">))</span>
+
+        <span class="s1">print</span><span class="s3">(</span><span class="s4">&quot;Saving data...&quot;</span><span class="s3">)</span>
+        <span class="s1">root</span><span class="s3">.</span><span class="s1">destroy</span><span class="s3">()</span>
+    <span class="s2">except </span><span class="s1">Exception </span><span class="s2">as </span><span class="s1">e</span><span class="s3">:</span>
+        <span class="s1">print</span><span class="s3">(</span><span class="s1">e</span><span class="s3">)</span>
+        <span class="s1">root</span><span class="s3">.</span><span class="s1">destroy</span><span class="s3">()</span>
+
+<span class="s2">def </span><span class="s1">load</span><span class="s3">(</span><span class="s1">n</span><span class="s3">):</span>
+    <span class="s2">global </span><span class="s1">gold</span>
+    <span class="s2">global </span><span class="s1">maxhp</span>
+    <span class="s2">global </span><span class="s1">maxMana</span>
+    <span class="s2">global </span><span class="s1">inventory</span>
+    <span class="s2">global </span><span class="s1">level</span>
+    <span class="s2">global </span><span class="s1">hp</span>
+    <span class="s2">global </span><span class="s1">starter</span>
+    <span class="s2">global </span><span class="s1">name</span>
+    <span class="s1">clear_screen</span><span class="s3">()</span>
+    <span class="s2">with </span><span class="s1">open</span><span class="s3">(</span><span class="s1">n</span><span class="s3">, </span><span class="s4">&quot;r&quot;</span><span class="s3">) </span><span class="s2">as </span><span class="s1">f</span><span class="s3">:</span>
+        <span class="s2">for </span><span class="s1">line </span><span class="s2">in </span><span class="s1">f</span><span class="s3">:</span>
+            <span class="s2">if </span><span class="s4">&quot;Gold&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">gold </span><span class="s3">= </span><span class="s1">int</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">6</span><span class="s3">:])</span>
+            <span class="s2">elif </span><span class="s4">&quot;Max Health&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">maxhp </span><span class="s3">= </span><span class="s1">int</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">12</span><span class="s3">:])</span>
+            <span class="s2">elif </span><span class="s4">&quot;Max Mana&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">maxMana </span><span class="s3">= </span><span class="s1">int</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">10</span><span class="s3">:])</span>
+            <span class="s2">elif </span><span class="s4">&quot;Inventory&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">inventory </span><span class="s3">= [</span><span class="s1">dict_to_item</span><span class="s3">(</span><span class="s1">item</span><span class="s3">) </span><span class="s2">for </span><span class="s1">item </span><span class="s2">in </span><span class="s1">ast</span><span class="s3">.</span><span class="s1">literal_eval</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">11</span><span class="s3">:].</span><span class="s1">strip</span><span class="s3">())]</span>
+            <span class="s2">elif </span><span class="s4">&quot;Level&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">level </span><span class="s3">= </span><span class="s1">float</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">7</span><span class="s3">:])</span>
+            <span class="s2">elif </span><span class="s4">&quot;HP&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">hp </span><span class="s3">= </span><span class="s1">int</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">4</span><span class="s3">:])</span>
+            <span class="s2">elif </span><span class="s4">&quot;Starter&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">starter </span><span class="s3">= </span><span class="s1">bool</span><span class="s3">(</span><span class="s1">line</span><span class="s3">[</span><span class="s5">9</span><span class="s3">:])</span>
+            <span class="s2">elif </span><span class="s4">&quot;Name&quot; </span><span class="s2">in </span><span class="s1">line</span><span class="s3">:</span>
+                <span class="s1">name </span><span class="s3">= </span><span class="s1">line</span><span class="s3">[</span><span class="s5">6</span><span class="s3">:-</span><span class="s5">1</span><span class="s3">]</span>
+    <span class="s1">home</span><span class="s3">()</span>
+
+
+<span class="s1">root</span><span class="s3">.</span><span class="s1">protocol</span><span class="s3">(</span><span class="s4">&quot;WM_DELETE_WINDOW&quot;</span><span class="s3">, </span><span class="s1">on_closing</span><span class="s3">)</span>
+
+
+<span class="s2">if </span><span class="s1">__name__ </span><span class="s3">== </span><span class="s4">&quot;__main__&quot;</span><span class="s3">:</span>
+    <span class="s1">menu</span><span class="s3">()</span>
+
+<span class="s1">root</span><span class="s3">.</span><span class="s1">mainloop</span><span class="s3">()</span>
+</pre>
+</body>
+</html>
